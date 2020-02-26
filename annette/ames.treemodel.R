@@ -2,10 +2,10 @@ library(tree)
 library(dplyr)
 houses <- read.csv("../../train.csv")
 modtree_df <- houses %>%
-  select(., OverallQual, GrLivArea, YearBuilt, KitchenQual, Fireplaces, 
+  select(., OverallQual, GrLivArea, YearBuilt, KitchenQual, Fireplaces,
          GarageArea, Neighborhood, YearRemodAdd, HeatingQC, SalePrice)
 modtree_df <- modtree_df %>%
-  mutate(., SalePrice = log(SalePrice))
+  mutate(., SalePrice = exp(SalePrice))
 head(modtree_df)
 summary(modtree_df)
 
@@ -121,7 +121,7 @@ summary(boost.ames)
 #use cross validation to select the number of trees. Instead, we will compute the
 #test error as a function of the number of trees and make a plot for illustrative
 #purposes.
-n.trees = seq(from = 100, to = 10000, by = 100)
+n.trees = seq(from = 50, to = 1000, by = 10)
 predmat = predict(boost.ames, newdata = modtree_df[-train, ], n.trees = n.trees)
 
 dim(predmat)
