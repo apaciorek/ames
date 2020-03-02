@@ -73,7 +73,8 @@ mean((yhat - ames1.test)^2)
 
 library(randomForest)
 set.seed(0)
-rf.ames = randomForest(SalePrice ~ ., data = modtree_df, subset = train, importance = T)
+rf.ames = randomForest(SalePrice ~ ., data = modtree_df, subset = train, importance = T,
+                       do.trace = 50)
 rf.ames
 
 #Varying the number of variables used at each step of the random forest procedure.
@@ -94,7 +95,7 @@ plot(1:9, oob.err, pch = 16, type = "b",
      ylab = "OOB Mean Squared Error",
      main = "Random Forest OOB Error Rates \nby # of Variables")
 
-# see error is lowest when # of variables at each split = 4
+# see error is lowest when # of variables at each split = 5
 
 
 #Can visualize a variable importance plot.
@@ -110,7 +111,7 @@ set.seed(0)
 boost.ames = gbm(SalePrice ~ ., data = modtree_df[train, ],
                    distribution = "gaussian",
                    n.trees = 10000,
-                   interaction.depth = 4)
+                   interaction.depth = 5)
 
 #Inspecting the relative influence.
 par(mfrow = c(1, 1))
@@ -121,7 +122,7 @@ summary(boost.ames)
 #use cross validation to select the number of trees. Instead, we will compute the
 #test error as a function of the number of trees and make a plot for illustrative
 #purposes.
-n.trees = seq(from = 50, to = 1000, by = 10)
+n.trees = seq(from = 50, to = 500, by = 1)
 predmat = predict(boost.ames, newdata = modtree_df[-train, ], n.trees = n.trees)
 
 dim(predmat)
@@ -129,7 +130,7 @@ dim(predmat)
 #Calculating the boosted errors.
 par(mfrow = c(1, 1))
 berr = with(modtree_df[-train, ], apply((predmat - SalePrice)^2, 2, mean))
-plot(n.trees, berr, pch = 16,
+plot(n.trees, berr, pch = 10,
      ylab = "Mean Squared Error",
      xlab = "# Trees",
      main = "Boosting Test Error")
@@ -142,7 +143,7 @@ abline(h = min(oob.err), col = "red")
 set.seed(0)
 boost.ames2 = gbm(SalePrice ~ ., data = modtree_df[train, ],
                     distribution = "gaussian",
-                    n.trees = 10000,
+                    n.trees = 500,
                     interaction.depth = 4,
                     shrinkage = 0.1)
 predmat2 = predict(boost.ames2, newdata = modtree_df[-train, ], n.trees = n.trees)
@@ -152,4 +153,8 @@ plot(n.trees, berr2, pch = 16,
      ylab = "Mean Squared Error",
      xlab = "# Trees",
      main = "Boosting Test Error")
+
+
+
+
 
